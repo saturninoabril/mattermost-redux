@@ -30,6 +30,19 @@ export function getUsers(state) {
     return state.entities.users.profiles;
 }
 
+export function getUsersByUsername = createSelector{
+    getUsers,
+    (users) => {
+        const usersByUsername = {};
+
+        for (const user of users) {
+            usersByUsername[user.username] = user;
+        }
+
+        return usersByUsername;
+    }
+);
+
 export function getAutocompleteUsersInChannel(state) {
     return state.entities.users.autocompleteUsersInChannel;
 }
