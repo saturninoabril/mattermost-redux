@@ -12,11 +12,12 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     let nextPosts = {};
 
     if (firstPost &&
+        isPostUserActivity(post.type) &&
         isPostUserActivity(firstPost.type) &&
-        firstPost.user_activity_ids.length < PostTypes.POST_PROPS_USER_ACTIVITIES_MAX &&
-        isPostUserActivity(post.type)
+        firstPost.user_activity_ids.length < PostTypes.POST_PROPS_USER_ACTIVITIES_MAX
     ) {
-        combineUserActivitySystemMessage(post, firstPost);
+        console.log("HEY post, firstPost", post, firstPost)
+        nextPosts = combineUserActivitySystemMessage(post, firstPost);
     } else {
         nextPosts = {
             ...posts,
