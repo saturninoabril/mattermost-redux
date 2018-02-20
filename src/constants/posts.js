@@ -44,5 +44,19 @@ export default {
         PostTypes.LEAVE_TEAM,
         PostTypes.ADD_TO_TEAM,
         PostTypes.REMOVE_FROM_TEAM
-    ]
+    ],
+    USER_ACTIVITY_POST_TYPES: [
+        PostTypes.ADD_REMOVE,
+        PostTypes.ADD_TO_CHANNEL,
+        PostTypes.JOIN_LEAVE,
+        PostTypes.JOIN_CHANNEL,
+        PostTypes.LEAVE_CHANNEL,
+        PostTypes.REMOVE_FROM_CHANNEL,
+        PostTypes.JOIN_TEAM,
+        PostTypes.LEAVE_TEAM,
+        PostTypes.ADD_TO_TEAM,
+        PostTypes.REMOVE_FROM_TEAM
+    ],
+    POST_PROPS_USER_ACTIVITIES: 'user_activities',
+    POST_PROPS_USER_ACTIVITIES_MAX: 30
 };
