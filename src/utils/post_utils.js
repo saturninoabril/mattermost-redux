@@ -131,3 +131,162 @@ export function comparePosts(a, b) {
 
     return 0;
 }
+
+export function generateNextPosts(posts = {}, newPost = {}, recentPost = {}) {
+    console.log('generateNextPosts')
+    let nextPosts;
+
+    // Only the new post is a user activity system post
+    if (
+        (!recentPost || !isPostUserActivity(recentPost)) &&
+        isPostUserActivity(newPost)
+    ) {
+        const postToAppend = {...newPost, system_ids: [newPost.id]};
+        nextPosts = {
+            ...posts,
+            [postToAppend.id]: postToAppend
+        };
+
+    // New and recent posts are user activity system posts
+    } else if (
+        recentPost &&
+        isPostUserActivity(recentPost) &&
+        isPostUserActivity(post) &&
+        recentPost.system_ids
+    ) {
+        if (recentPost.system_ids.length < PostTypes.POST_PROPS_USER_ACTIVITIES_MAX) {
+            let {combinedSystemPost, deletedSystemPost} = combineUserActivitySystemPost(newPost, recentPost);
+
+            nextPosts = {
+                ...posts,
+                [combinedSystemPost.id]: combinedSystemPost,
+                [deletedSystemPost.id]: deletedSystemPost
+            };
+        }
+
+    // Regular posts or combined user activity post has reached maximum combined posts
+    } else {
+        console.log('3 generateNextPosts')
+        nextPosts = {
+            ...posts,
+            [newPost.id]: newPost
+        };
+    }
+
+    Object.keys(nextPosts).forEach((id) => {
+        if (nextPosts[id].state === Posts.POST_DELETED) {
+            Reflect.deleteProperty(nextPosts, id);
+        }
+    });
+
+    return nextPosts;
+}
+
+// TODO: check if need to export
+export function isPostUserActivity(post) {
+    return post.type && post.type !== '' && Posts.USER_ACTIVITY_POST_TYPES.includes(post.type);
+}
+
+// TODO: check if need to export
+export function combineUserActivitySystemPost(newSystemPost, recentSystemPost) {
+    const newMessage = `${recentSystemPost.message} ${newSystemPost.message}`;
+    const systemIds = [...recentSystemPost.system_ids, newSystemPost.id];
+
+    let newUserActivities = recentSystemPost.props.user_activities;
+    newUserActivities.push({...newSystemPost.props, type: newSystemPost.type});
+    const newProps = {...recentSystemPost.props, user_activities: newUserActivities};
+
+    const combinedSystemPost = {
+        ...recentSystemPost,
+        message: newMessage,
+        system_ids: systemIds,
+        props: newProps
+    };
+
+    const deletedSystemPost = {
+        ...newSystemPost,
+        state: Posts.POST_DELETED
+    }
+
+    return {combinedSystemPost, deletedSystemPost};
+}
+
+export function combineUserActivitySystemPosts(posts = {}, postsForChannel = []) {
+    let nextPosts = {...posts};
+    let combinedSystemPosts;
+    let deletedSystemPosts = [];
+    const {POST_PROPS_USER_ACTIVITIES, POST_PROPS_USER_ACTIVITIES_MAX} = Posts;
+
+    function updateNextPosts(newPosts, combinedPost, deletedPosts) {
+        newPosts = {
+            ...newPosts,
+            [combinedPost.id]: combinedPost
+        }
+
+        deletedPosts.forEach((deletedPost) => {
+            newPosts = {
+                ...newPosts,
+                [deletedPost.id]: deletedPost
+            }
+        });
+
+        return newPosts;
+    }
+
+    for (let i = postsForChannel.length - 1; i >= 0; i--) {
+        const post = nextPosts[postsForChannel[i]];
+
+        if (
+            isPostUserActivity(post) &&
+            post.state !== Posts.POST_DELETED
+        ) {
+            if (!combinedSystemPosts) {
+                combinedSystemPosts = {
+                    ...post,
+                    system_ids: [post.id],
+                    props: {...post.props, user_activities: [{...post.props, type: post.type}]}
+                };
+                nextPosts = {
+                    ...nextPosts,
+                    [combinedSystemPosts.id]: combinedSystemPosts
+                }
+                
+            } else if (combinedSystemPosts) {
+                if (combinedSystemPosts.system_ids.length < POST_PROPS_USER_ACTIVITIES_MAX) {
+                    let {combinedSystemPost, deletedSystemPost} = combineUserActivitySystemPost(post, combinedSystemPosts);
+                    combinedSystemPosts = combinedSystemPost;
+                    deletedSystemPosts.push(deletedSystemPost)
+                } else {
+                    nextPosts = updateNextPosts(nextPosts, combinedSystemPosts, deletedSystemPosts);
+                    combinedSystemPosts = null;
+                    deletedSystemPosts = [];
+                }
+            }
+        } else if (combinedSystemPosts) {
+            nextPosts = {
+                ...nextPosts,
+                [combinedSystemPosts.id]: combinedSystemPosts
+            }
+
+            combinedSystemPosts = null;
+        }
+    }
+
+    if (combinedSystemPosts) {
+        nextPosts = updateNextPosts(nextPosts, combinedSystemPosts, deletedSystemPosts);
+        combinedSystemPosts = null;
+        deletedSystemPosts = [];
+    }
+
+    Object.keys(nextPosts).forEach((id) => {
+        if (nextPosts[id].state === Posts.POST_DELETED) {
+            Reflect.deleteProperty(nextPosts, id);
+        }
+    });
+
+    const nextPostsInChannel = postsForChannel.filter((postId) => {
+        return typeof nextPosts[postId] !== 'undefined';
+    });
+
+    return {nextPosts, nextPostsInChannel};
+}

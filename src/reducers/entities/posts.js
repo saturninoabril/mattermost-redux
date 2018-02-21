@@ -3,17 +3,28 @@
 
 import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
-import {comparePosts} from 'utils/post_utils';
+import {
+    combineUserActivitySystemPosts,
+    comparePosts,
+    generateNextPosts,
+    isPostUserActivity
+} from 'utils/post_utils';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
+    console.log('1 handleReceivedPost');
     const post = action.data;
     const channelId = post.channel_id;
 
-    const nextPosts = {
-        ...posts,
-        [post.id]: post
-    };
+    let recentPost;
+    if (
+        postsInChannel[channelId] &&
+        postsInChannel[channelId][0] &&
+        posts[postsInChannel[channelId][0]]
+    ) {
+        recentPost = posts[postsInChannel[channelId][0]];
+    }
 
+    const nextPosts = generateNextPosts(posts, post, recentPost);
     let nextPostsForChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
@@ -32,6 +43,7 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
 }
 
 function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
+    console.log('2 handleReceivedPosts');
     const newPosts = action.data.posts;
     const channelId = action.channelId;
     const skipAddToChannel = action.skipAddToChannel;
@@ -88,9 +100,13 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
         return comparePosts(nextPosts[a], nextPosts[b]);
     });
 
-    nextPostsForChannel[channelId] = postsForChannel;
+    const {
+        nextPosts: combinedPosts,
+        nextPostsInChannel: combinedPostsInChannel
+    } = combineUserActivitySystemPosts(nextPosts, postsForChannel);
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+    nextPostsForChannel[channelId] = combinedPostsInChannel;
+    return {posts: combinedPosts, postsInChannel: nextPostsForChannel};
 }
 
 function handlePendingPosts(pendingPostIds = [], action) {
