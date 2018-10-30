@@ -544,8 +544,6 @@ export function makePreparePostIdsForPostList() {
                 out.push(post.id);
             }
 
-            // Flip it back to newest to oldest
-            // return out.reverse();
             return out;
         }
     );
