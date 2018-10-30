@@ -26,6 +26,11 @@ export const PostTypes = {
     COMBINED_USER_ACTIVITY: 'system_combined_user_activity',
 };
 
+export const PostListSeparators = {
+    DATE_LINE: 'date-',
+    START_OF_NEW_MESSAGES: 'start-of-new-messages',
+};
+
 export default {
     POST_CHUNK_SIZE: 60,
     POST_DELETED: 'DELETED',
@@ -61,4 +66,5 @@ export default {
         PostTypes.LEAVE_TEAM,
         PostTypes.REMOVE_FROM_TEAM,
     ],
+    POST_LIST_SEPARATORS: PostListSeparators,
 };

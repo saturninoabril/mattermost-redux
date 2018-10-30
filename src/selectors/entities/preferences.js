@@ -190,3 +190,8 @@ export function makeGetStyleFromTheme() {
         }
     );
 }
+
+export function shouldShowJoinLeaveMessages(state) {
+    // This setting is true or not set if join/leave messages are to be displayed
+    return getBool(state, Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE, true);
+}
