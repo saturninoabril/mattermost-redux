@@ -229,3 +229,7 @@ export const getSidebarPreferences = createSelector(
         return sidebarPrefs;
     }
 );
+
+export function shouldShowJoinLeaveMessages(state) {
+    return getBool(state, Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE, true);
+}
