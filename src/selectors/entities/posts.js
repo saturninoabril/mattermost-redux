@@ -573,7 +573,6 @@ export function makePreparePostIdsForPostList() {
                     indicateNewMessages
                 ) {
                     // Added postId to solve ie11 rendering issue
-                    console.log('add START_OF_NEW_MESSAGES')
                     out.push(Posts.POST_LIST_SEPARATORS.START_OF_NEW_MESSAGES + post.id);
                     addedNewMessagesIndicator = true;
                 }
@@ -581,7 +580,10 @@ export function makePreparePostIdsForPostList() {
                 out.push(post.id);
             }
 
-            return out;
+            // return out;
+
+            // TODO: invert the sort to check loading of post on scroll down
+            return out.reverse();
         }
     );
 }
