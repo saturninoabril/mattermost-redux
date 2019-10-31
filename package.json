@@ -39,11 +39,6 @@
     "serialize-error": "2.1.0",
     "shallow-equals": "1.0.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run check && npm run tsc"
-    }
-  },
   "jest-junit": {
     "output": "build/test-results.xml"
   },

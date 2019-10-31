@@ -32,3 +32,29 @@ export function getTimezoneRegion(timezone: string): string {
 
     return timezone;
 }
+
+export function generateUtcLabel(text: string, offset: number, isDST: boolean): string {
+    let prefix = '';
+
+    const hour = Math.floor(offset)
+    const minute = Math.abs(offset % 1);
+
+    if (offset === 0) {
+        prefix = '(UTC)';
+    } else {
+        let hourText;
+        if (hour >= 10) {
+            hourText = '+' + hour;
+        } else if (hour > 0) {
+            hourText = '+0' + hour;
+        } else if (hour > -10) {
+            hourText = '-0' + Math.abs(hour);
+        } else {
+            hourText = hour;
+        }
+    
+        prefix = `(UTC${hourText}:${minute === 0 ? '00' : (minute * 60).toFixed(0)})`;
+    }
+
+    return `${prefix} ${text}${isDST ? ' - DST' : ''}`;
+}

@@ -1,7 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import moment from 'moment-timezone';
 import {combineReducers} from 'redux';
+
+import {generateUtcLabel} from 'utils/timezone_utils';
+
 import {GeneralTypes, UserTypes} from 'action_types';
 
 function config(state = {}, action) {
@@ -73,13 +77,54 @@ function license(state = {}, action) {
 function timezones(state = [], action) {
     switch (action.type) {
     case GeneralTypes.SUPPORTED_TIMEZONES_RECEIVED:
-        return action.data;
+        return prepareTimezones(action.data).sort(sortTimezones);
     case UserTypes.LOGOUT_SUCCESS:
         return [];
     default:
         return state;
     }
 }
+
+type Timezone = {
+    offset: number;
+    is_dst: boolean;
+    group: string;
+    utc: string[];
+    label?: string;
+}
+
+function prepareTimezones(data: Timezone[]): Timezone[] {
+    console.log('!!!prepareTimezones!!!')
+    return data.map((timezone) => {
+        const tz = moment.tz(timezone.utc[0]);
+        const offset = tz.utcOffset() / 60;
+        const isDST = tz.isDST();
+
+        return {
+            ...timezone,
+            offset: tz.utcOffset() / 60,
+            is_dst: tz.isDST(),
+            label: generateUtcLabel(timezone.group, offset, isDST),
+        };
+    });
+}
+
+function sortTimezones(a, b) {
+    if (a.offset != b.offset) {
+        return a.offset - b.offset
+    } else {
+        var groupA = a.group.toLowerCase();
+        var groupB = b.group.toLowerCase();
+        if (groupA < groupB) {
+            return -1;
+        }
+        if (groupA > groupB) {
+            return 1;
+        }
+    
+        return 0;
+    }
+};
 
 function serverVersion(state = '', action) {
     switch (action.type) {
