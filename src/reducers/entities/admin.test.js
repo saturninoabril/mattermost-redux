@@ -171,7 +171,7 @@ describe('reducers.entities.admin', () => {
                     ],
                 },
                 plugin_1: {
-                    id: 'plugin_1',
+                    id: 'plugin_3',
                     version: '0.0.1',
                     state: PluginState.PLUGIN_STATE_RUNNING,
                     name: 'Plugin 1',

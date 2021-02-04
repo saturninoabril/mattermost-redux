@@ -71,6 +71,6 @@ describe('utils.makeAddLastViewAtToProfiles', () => {
         });
 
         const addLastViewAtToProfiles = makeAddLastViewAtToProfiles();
-        assert.deepEqual(addLastViewAtToProfiles(testState, [user1, user2, user3, user4]), [{...user1, last_viewed_at: 1}, {...user2, last_viewed_at: 2}, {...user3, last_viewed_at: 3}, {...user4, last_viewed_at: 0}]);
+        assert.deepEqual(addLastViewAtToProfiles(testState, [user1, user2, user3, user4]), [{...user1, last_viewed_at: 5}, {...user2, last_viewed_at: 2}, {...user3, last_viewed_at: 3}, {...user4, last_viewed_at: 0}]);
     });
 });
