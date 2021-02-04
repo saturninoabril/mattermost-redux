@@ -51,7 +51,7 @@ jobs:
             ls -rtl
             ls -rtl build
       - store_test_results:
-          path: build
+          path: /
 
 workflows:
   version: 2
