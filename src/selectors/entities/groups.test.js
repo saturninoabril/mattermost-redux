@@ -139,7 +139,7 @@ describe('Selectors.Groups', () => {
             group3,
             group4,
         ];
-        assert.deepEqual(Selectors.getGroupsAssociatedToChannel(testState, 'channelID'), expected);
+        assert.deepEqual(Selectors.getGroupsAssociatedToChannel(testState, channelID), expected);
     });
 
     it('getGroupsNotAssociatedToChannel', () => {
