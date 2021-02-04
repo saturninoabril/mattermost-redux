@@ -44,11 +44,9 @@ jobs:
     steps:
       - checkout
       - *restore_cache
-      - run:
-          command: |
-            npm test
-            pwd
-            ls -rtl
+      - run: npm test
+      - store_artifacts:
+          path: build
       - store_test_results:
           path: build
 
