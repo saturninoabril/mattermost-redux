@@ -49,7 +49,6 @@ jobs:
             npm test
             pwd
             ls -rtl
-            ls -rtl build
       - store_test_results:
           path: /
 
