@@ -50,7 +50,7 @@ jobs:
             pwd
             ls -rtl
       - store_test_results:
-          path: /
+          path: ~/mattermost-redux
 
 workflows:
   version: 2
