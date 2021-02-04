@@ -47,7 +47,8 @@
     }
   },
   "jest-junit": {
-    "output": "build/test-results.xml"
+    "outputDirectory": "./build",
+    "outputName": "junit.xml"
   },
   "devDependencies": {
     "@babel/core": "7.9.0",
